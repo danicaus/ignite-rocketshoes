@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
-import { isConstructorDeclaration } from 'typescript';
+// import { isConstructorDeclaration } from 'typescript';
 import { api } from '../services/api';
 import { Product, Stock } from '../types';
 
@@ -116,7 +116,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         
         setCart([...cart, itemAmountUpdated])
       }
-      
+
       localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
 
     } catch {
