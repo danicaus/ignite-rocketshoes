@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
+import { isConstructorDeclaration } from 'typescript';
 import { api } from '../services/api';
 import { Product, Stock } from '../types';
 
@@ -44,10 +45,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       }
       
       if(isProductOnCart.length){
-        console.log(isProductOnCart)
         const amount = productStock[0].amount - isProductOnCart[0].amount
-        console.log(productStock[0].amount)
-        console.log(amount)
         if(!amount){
           productAmountOnCart = {...productAmountOnCart, amount: (isProductOnCart[0].amount)}
           toast.error('Quantidade solicitada fora de estoque')
@@ -77,7 +75,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     }
   };
 
-  //Receber a quantidade e gravar no localStorage
   const updateProductAmount = async ({
     productId,
     amount,
@@ -85,8 +82,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       let itemAmountUpdated: Product
       const isProductOnCart = cart.filter(cartItem => cartItem.id === productId)
-
-      if(isProductOnCart){
+      
+      if(isProductOnCart.length > 0){
         itemAmountUpdated = {
           id: isProductOnCart[0].id,
           title: isProductOnCart[0].title,
@@ -94,20 +91,21 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           image: isProductOnCart[0].image,
           amount: amount
         }
-
+        
         const cartUpdated = cart.map(cartItem => {
           if(cartItem.id === itemAmountUpdated.id){
             return {...cartItem, amount: itemAmountUpdated.amount}
           }
           return cartItem
         })
-
+        
         setCart(cartUpdated)
-
+      
       } else {
-        const getProduct: Product[] = await api.get('products')
+        const response = await api.get('products')
+        const getProduct: Product[] = response.data
         const selectProduct = getProduct.filter(product => product.id === productId)
-
+        
         itemAmountUpdated = {
           id: selectProduct[0].id,
           title: selectProduct[0].title,
@@ -118,8 +116,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         
         setCart([...cart, itemAmountUpdated])
       }
-
-      console.log(itemAmountUpdated)
+      
       localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
 
     } catch {
