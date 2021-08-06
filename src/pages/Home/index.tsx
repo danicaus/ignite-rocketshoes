@@ -26,10 +26,8 @@ const Home = (): JSX.Element => {
   const { addProduct, cart } = useCart();
 
   const cartItemsAmount = cart.reduce((sumAmount, product) => {
-      let key = product.id
-      if (!sumAmount[key]) {
-        sumAmount[key] = product.amount
-      }
+      const key = product.id
+      sumAmount[key] = product.amount
       return sumAmount
     }
   , {} as CartItemsAmount)
